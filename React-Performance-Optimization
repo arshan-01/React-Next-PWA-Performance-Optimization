@@ -1,0 +1,55 @@
+#### React Performance Optimization
+
+```
+import React, { Suspense, useEffect, useRef } from 'react';
+
+// Lazy load component for code splitting
+const LazyComponent = React.lazy(() => import('./components/LazyComponent'));
+
+function HomePage() {
+  const observerRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          console.log('Load more triggered');
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) observer.unobserve(observerRef.current);
+    };
+  }, []);
+
+  return (
+    <div>
+      <h1>Welcome to Optimized React App</h1>
+
+      {/* Code splitting using React.lazy */}
+      <Suspense fallback={<div>Loading component...</div>}>
+        <LazyComponent />
+      </Suspense>
+
+      {/* Intersection Observer trigger */}
+      <div ref={observerRef} style={{ height: '100px', background: '#ccc' }}>
+        Scroll here to load more...
+      </div>
+
+      {/* Static Footer */}
+      <footer>
+        <p>This is the footer section.</p>
+      </footer>
+    </div>
+  );
+}
+
+export default HomePage;
+
+```
